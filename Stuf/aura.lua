@@ -357,15 +357,22 @@ do 	-- Aura handlers -----------------------------------------------------------
 	Stuf.ApplyPush = ApplyPush
 	local ShowSetupMode
 	local temp, debuffconfig, rtime, showpet = { }, nil, nil, nil
-	local UnitBuff, UnitDebuff, UnitIsUnit = UnitBuff, UnitDebuff, UnitIsUnit
+	local function UnitBuff(...)
+        return AuraUtil.UnpackAuraData(C_UnitAuras.GetBuffDataByIndex(...))
+    end
+
+    local function UnitDebuff(...)
+        return AuraUtil.UnpackAuraData(C_UnitAuras.GetDebuffDataByIndex(...))
+    end
 	function UpdateAura(unit, uf, _, _, _, config)  -- updates all elements dealing with buffs/debuffs
 		-----------------------------------------------
 		-- edited on 3MAY2022 uf = uf or su[unit]
+		if unit then uf = su[unit] end
 		uf = type(uf) == "table" and uf or su[unit]
 		-----------------------------------------------
 		if not uf or uf.hidden then return end
 		
-		local allow, clr, bfilter, dfilter, onlymineb, onlymined = true, nil, nil, nil, nil, nil
+		local allow, clr, bfilter, dfilter, onlymineb, onlymined, onlyStealable, onlyDispellable = true, nil, nil, nil, nil, nil, nil, nil
 		local name, icon, count, atype, duration, endtime, ismine, isstealable
 		local cache = uf.cache
 		
@@ -375,16 +382,21 @@ do 	-- Aura handlers -----------------------------------------------------------
 		end
 		if not buffgroup or buffgroup.hidden then
 			buffgroup = nil
-		elseif cache.assist then
-			bfilter = buffgroup.filter
-			onlymineb = buffgroup.db.onlymine
+		else
+		    onlymineb = buffgroup.db.onlymine
+            onlyStealable = buffgroup.db.onlyStealable
+	        if cache.assist then
+			    bfilter = buffgroup.filter
+		    end
 		end
 		if not debuffgroup or debuffgroup.hidden then
 			debuffgroup = nil
-		elseif cache.assist then
-			dfilter = debuffgroup.filter
 		else
 			onlymined = debuffgroup.db.onlymine
+			onlyDispellable = debuffgroup.db.onlyDispellable
+		    if cache.assist then
+			    dfilter = debuffgroup.filter
+		    end
 		end
 		if not auratimers or auratimers.hidden then
 			auratimers = nil
@@ -482,9 +494,9 @@ do 	-- Aura handlers -----------------------------------------------------------
 		
 		for i = 1, 32, 1 do  -- update buffgroup
 			if allow then  -- prevents calling UnitBuff when it's useless
-				name, icon, count, atype, duration, endtime, ismine, isstealable = C_UnitAuras.GetBuffDataByIndex(unit, i, bfilter)
+				name, icon, count, atype, duration, endtime, ismine, isstealable = AuraUtil.UnpackAuraData(C_UnitAuras.GetBuffDataByIndex(unit, i, bfilter))
 				ismine = ismine == "player" or ismine == "vehicle" or (showpet and ismine == "pet")
-				allow = name and (not onlymineb or ismine)
+                allow = name and (not onlymineb or ismine) and (not onlyStealable or isstealable)
 			end
 			
 			local b = buffgroup and buffgroup[i]
@@ -517,10 +529,10 @@ do 	-- Aura handlers -----------------------------------------------------------
 		allow = true
 		for i = 1, 40, 1 do  -- update debuffgroup
 			if allow then  -- prevents calling UnitDebuff when it's useless
-				name, icon, count, atype, duration, endtime, ismine, isstealable = C_UnitAuras.GetDebuffDataByIndex(unit, i, dfilter)
+				name, icon, count, atype, duration, endtime, ismine, isstealable = UnitDebuff(unit, i, dfilter)
 				ismine = ismine == "player" or ismine == "vehicle" or (showpet and ismine == "pet")
 				clr = dbgaura[atype or "none"] or dbgaura.none
-				allow = name and (not onlymined or ismine)
+				allow = name and (not onlymined or ismine) and (not onlyDispellable or AuraUtil.DispellableDebuffTypes[atype]~= nil)
 			end
 			
 			local b = debuffgroup and debuffgroup[i]
@@ -920,6 +932,11 @@ do  -- Dispell Icon ------------------------------------------------------------
 		if (dir == 0.5 and alp > 0.7) or (dir == -0.5 and alp < 0.3) then
 			this.dir = dir * -1
 		end
+		if alp > 0.7 then  -- 自行修正
+        	alp = 0.7
+        elseif alp < 0.3 then
+        	alp = 0.3
+        end
 		this.alp = alp
 		this:SetAlpha(alp)  -- flash between 0.3 and 0.7 alpha
 	end

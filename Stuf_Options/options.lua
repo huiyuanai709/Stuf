@@ -1633,6 +1633,7 @@ local buffgroup={
 		onlymine=onlymine,
 		curable={ name=L["Show Only Castable on Friendlies"], type="toggle", set=set, get=get, order=16.1, },
 		showpie=showpie, pieonlymine=pieonlymine, hidecc=hidecc, nomouse=nomouse,
+        onlyStealable={ name=L["Show Only Stealable"], desc=L["toggle"], type="toggle", set=set, get=get, order = 16.6 },
 		countt=countt, time=timet,
 	},
 }
@@ -1650,6 +1651,7 @@ local debuffgroup={
 		onlymine=onlymine,
 		curable={ name=L["Show Only Curable on Friendlies"], type="toggle", set=set, get=get, order=16.1, },
 		showpie=showpie, pieonlymine=pieonlymine, hidecc=hidecc, nomouse=nomouse,
+		onlyDispellable={ name=L["Show Only Dispellable"], desc=L["toggle"], type="toggle", set=set, get=get, order = 16.6 },
 		countt=countt, time=timet,
 	},
 }
