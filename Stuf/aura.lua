@@ -581,6 +581,10 @@ do  -- Aura Icons --------------------------------------------------------------
 		GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT", 8, -16)
 		GameTooltip:SetInventoryItem("player", (this.id == 1 and 16) or 17)
 	end
+	
+	local function cancelBuff(this)
+	    CancelUnitBuff("player", this.id)
+    end
 	local function TempEnchantOnUpdate(unit, uf, _, _, _, config)
 		uf = uf or su[unit]
 		local f = uf and not uf.hidden and uf.tempenchant
@@ -654,7 +658,7 @@ do  -- Aura Icons --------------------------------------------------------------
 				uf.refreshfuncs.tempenchant = TempEnchantOnUpdate
 				uf.metroelements.tempenchant = TempEnchantOnUpdate
 			elseif isplayer and isbuff then
-				f.secure = CreateFrame("Frame", nil, f, "SecureAuraHeaderTemplate,BackdropTemplate")
+				f.secure = CreateFrame("Frame", nil, f, "BackdropTemplate")
 				f.secure:SetSize(2, 2)
 				f.secure:SetAttribute("unit", "player")
 				f.secure:SetAttribute("filter", "HELPFUL")
@@ -768,6 +772,11 @@ do  -- Aura Icons --------------------------------------------------------------
 				icon.id = i
 				icon:SetScript("OnEnter", (isdebuff and DebuffOnEnter) or (istemp and TempOnEnter) or BuffOnEnter)
 				icon:SetScript("OnLeave", Stuf.GameTooltipOnLeave)
+				
+				if isplayer and isbuff then
+				    icon:SetScript("OnClick", cancelBuff)
+				    icon:RegisterForClicks("RightButtonUp")
+				end
 
 				f[i] = icon
 			end

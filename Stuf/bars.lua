@@ -914,13 +914,13 @@ if CLS == "SHAMAN" or CLS == "DRUID" or CLS == "DEATHKNIGHT" or CLS == "PALADIN"
 				if reverse then
 					b.icon:SetPoint("LEFT", b, "RIGHT")
 					b.time:SetJustifyH("LEFT")
-					b.time:SetJustifyV("CENTER")
+					b.time:SetJustifyV("MIDDLE")
 					b.click:SetPoint("TOPLEFT", b, "TOPLEFT")
 					b.click:SetPoint("BOTTOMRIGHT", b.icon, "BOTTOMRIGHT")
 				else
 					b.icon:SetPoint("RIGHT", b, "LEFT")
 					b.time:SetJustifyH("RIGHT")
-					b.time:SetJustifyV("CENTER")
+					b.time:SetJustifyV("MIDDLE")
 					b.click:SetPoint("TOPLEFT", b.icon, "TOPLEFT")
 					b.click:SetPoint("BOTTOMRIGHT", b, "BOTTOMRIGHT")
 				end

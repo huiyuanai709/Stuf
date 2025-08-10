@@ -14,7 +14,7 @@ local UnitIsTapDenied = UnitIsTapDenied
 local UnitIsDeadOrGhost, UnitIsDead, UnitIsGhost, UnitIsConnected = UnitIsDeadOrGhost, UnitIsDead, UnitIsGhost, UnitIsConnected
 local UnitIsAFK, UnitIsDND = UnitIsAFK, UnitIsDND
 local UnitSex = UnitSex
-local UnitIsVisible, GetSpellTexture, IsSpellInRange, UnitInRange = UnitIsVisible, C_Spell.GetSpellTexture, IsSpellInRange, UnitInRange
+local UnitIsVisible, GetSpellTexture, IsSpellInRange, UnitInRange = UnitIsVisible, C_Spell.GetSpellTexture, C_Spell.IsSpellInRange, UnitInRange
 local UnitAffectingCombat, InCombatLockdown = UnitAffectingCombat, InCombatLockdown
 
 local format, strmatch, gsub = format, strmatch, gsub
@@ -45,7 +45,7 @@ local conditions = {
 		if ( unit == "player" or not ca.assist or ca.dead or not UnitIsConnected(unit) ) then
 			return false
 		elseif ( not UnitIsVisible(unit) ) or
-		       ( s40 and IsSpellInRange(s40, BOOKTYPE_SPELL, unit) == 0 ) or
+		       ( s40 and IsSpellInRange(s40, Enum.SpellBookSpellBank.Player, unit) == 0 ) or
 			   ( not s40 and Stuf.ingroup and ca.ingroup and not UnitInRange(unit) ) then
 			return true
 		end
