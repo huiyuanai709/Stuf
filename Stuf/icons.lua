@@ -214,7 +214,7 @@ do  -- General Icons -----------------------------------------------------------
 		UpdateStatusIcon("player", su.player)
 	end
 	
-	local select, GetLootMethod, GetRaidRosterInfo = select, GetLootMethod, GetRaidRosterInfo
+	local select, GetLootMethod = select, (C_PartyInfo and C_PartyInfo.GetLootMethod) or GetLootMethod
 	local UnitIsGroupLeader, UnitIsUnit = UnitIsGroupLeader, UnitIsUnit
 	local function updateuniticon(uf, icon, show)
 		local f = uf and not uf.hidden and uf[icon]
@@ -239,14 +239,14 @@ do  -- General Icons -----------------------------------------------------------
 		end
 		partyiconhidden = nil
 		-- find out which unit is master looter if any
-		local method, looter = GetLootMethod()
+		local method, looter, raidIndex = GetLootMethod()
 		if method == "master" then
 			if looter then
 				looter = (looter == 0 and "player") or "party"..looter
 			elseif tar and tar.cache.ingroup then
 				for i = 1, Stuf.numraid, 1 do
-					if select(11, GetRaidRosterInfo(i)) then
-						looter = "raid"..i
+					if raidIndex then
+						looter = "raid"..raidIndex
 						break
 					end
 				end
